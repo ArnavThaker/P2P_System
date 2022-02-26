@@ -13,6 +13,7 @@
 #include <err.h>
 #include <arpa/inet.h>
 
+#include "client.h"
 
 int cli_sd = -1;
 
