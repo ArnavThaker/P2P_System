@@ -15,9 +15,18 @@
 
 #include "server.h"
 
+
+int serv_sd = -1;
+
 /*
 
  */
 bool connected(const char* ip, uint16_t port) {
   
+}
+
+
+void disconnected (void) {
+  close(serv_sd);
+  serv_sd = -1;
 }
