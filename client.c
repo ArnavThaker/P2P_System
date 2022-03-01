@@ -14,6 +14,9 @@
 #include <arpa/inet.h>
 
 #include "client.h"
+#define PORT 5000
+#define IP "127.0.0.1"
+
 
 int cli_sd = -1;
 
@@ -26,9 +29,9 @@ bool connected(const char *ip, uint16_t port) {
   struct sockaddr_in binAddr;
 
   binAddr.sin_family = AF_INET;
-  binAddr.sin_port = htons(JBOD_PORT);
+  binAddr.sin_port = htons(PORT);
 
-  if (inet_aton(ip, &binAddr.sin_addr) == 0) {
+  if (inet_aton(IP, &binAddr.sin_addr) == 0) {
     return false;
   } else if (cli_sd == -1) {
     return false;
