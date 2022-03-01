@@ -14,7 +14,8 @@
 #include <arpa/inet.h>
 
 #include "server.h"
-
+#define PORT 5000
+#define IP "127.0.0.1"
 
 int serv_sd = -1;
 
