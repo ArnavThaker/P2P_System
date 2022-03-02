@@ -16,8 +16,11 @@
 #include "server.h"
 #define PORT 5000
 #define IP "127.0.0.1"
+#define FILE_SIZE 1024
+#define MAX_CLIENTS 10
 
 int serv_sd = -1;
+int clients[MAX_CLIENTS]; 
 
 /*
 
