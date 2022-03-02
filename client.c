@@ -52,13 +52,13 @@ void disconnected(void) {
 }
 
 /*
-Need method for socket connection
+Need method for chunk creation
  */
 
 /*
-Need method for socket connection
+Need method for chunk sending
  */
 
 /*
-Need method for socket connection
+Need method for chunk receiving
  */
