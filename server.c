@@ -23,14 +23,6 @@ int serv_sd = -1;
 
 int clients[MAX_CLIENTS]; 
 
-/*
-
- */
-bool connected(const char* ip, uint16_t port) {
-  
-}
-
-
 void disconnected (void) {
   close(serv_sd);
   serv_sd = -1;
@@ -58,7 +50,9 @@ bool create_server(const char* ip, uint16_t port) {
 
 void server_listening(serv_sd, MAX_CLIENTS) {
   listen(serv_sd, MAX_CLIENTS);
-  
+  len = sizeof(server);
+
+    
 }
 /***************************************************/
 #include <stdio.h>
