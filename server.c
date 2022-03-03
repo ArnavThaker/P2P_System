@@ -12,24 +12,22 @@
 #include <errno.h>
 #include <err.h>
 #include <arpa/inet.h>
-
 #include "server.h"
+
 #define PORT 5000
 #define IP "127.0.0.1"
 #define FILE_SIZE 1024
 #define MAX_CLIENTS 10
 
 int serv_sd = -1;
-
 int clients[MAX_CLIENTS]; 
+int files[MAX_CLIENTS * 5];
 
-void disconnected (void) {
-  close(serv_sd);
-  serv_sd = -1;
-}
-
+/* creates a server through the standard socket creation and socket binding procedure */
 bool create_server(const char* ip, uint16_t port) {
-  struct sockaddr_in server;
+  struct sockaddr_in server, client;
+
+  // create server socket and make it TCP, perform check to ensure successful creation
   serv_sd = socket(AF_INET, SOCK_STREAM, 0);
   if (serv_sd == -1) {
     return false;
@@ -37,10 +35,17 @@ bool create_server(const char* ip, uint16_t port) {
     return true;
   }
 
+  // initialize a server struct and its fields as TCP, predefined port, and predefined IP address 
   server.sin_family = AF_INET;
-  server.sin_port = htons(PORT);
+  server.sin_port = htons(port);
   server.sin_addr.s_addr = inet_addr(ip);
 
+  // control sequence to initialize an empty client list
+  for (int i = 0; i < MAX_CLIENTS; i++) {
+    clients[i] = -1;
+  }
+
+  // bind the server socket descriptor to the server struct 
   if ((bind(serv_sd, (struct sockaddr* ) &server, sizeof(server))) != 0) {
     return false;
   } else {
@@ -48,105 +53,34 @@ bool create_server(const char* ip, uint16_t port) {
   }
 }
 
-void server_listening(serv_sd, MAX_CLIENTS) {
-  listen(serv_sd, MAX_CLIENTS);
-  len = sizeof(server);
+/* function that wraps listen and accept procedures of programming a server and manipulates key global considerations */
+void listen_and_accept(int serv_sd, struct sockaddr_in client) {
+  // places server in passive listen mode using listen()
+  if (listen(serv_sd, MAX_CLIENTS) != 0) {
+    exit(1);
+  }
 
-    
-}
-/***************************************************/
-#include <stdio.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#define MAX 80
-#define PORT 8080
-#define SA struct sockaddr
+  // server accepts incoming connections using accept()
+  int len = sizeof(client);
+  int connected = accept(serv_sd, (struct sockaddr_in *) &client, (struct socklen_t *) &len);
+  if (connected < 0) {
+    exit(1);
+  }
 
-// Function designed for chat between client and server.
-void func(int connfd)
-{
-	char buff[MAX];
-	int n;
-	// infinite loop for chat
-	for (;;) {
-		bzero(buff, MAX);
-
-		// read the message from client and copy it in buffer
-		read(connfd, buff, sizeof(buff));
-		// print buffer which contains the client contents
-		printf("From client: %s\t To client : ", buff);
-		bzero(buff, MAX);
-		n = 0;
-		// copy server message in the buffer
-		while ((buff[n++] = getchar()) != '\n')
-			;
-
-		// and send that buffer to client
-		write(connfd, buff, sizeof(buff));
-
-		// if msg contains "Exit" then server exit and chat ended.
-		if (strncmp("exit", buff, 4) == 0) {
-			printf("Server Exit...\n");
-			break;
-		}
-	}
+  // control sequence to populate server's global clients list with newly accepted connections; populates in sequence
+  for(int i = 0; i < MAX_CLIENTS; i++) {
+    if (clients[i] == -1) {
+      clients[i] == connected;
+      break;
+    }
+  }
 }
 
-// Driver function
-int main()
-{
-	int sockfd, connfd, len;
-	struct sockaddr_in servaddr, cli;
-
-	// socket create and verification
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockfd == -1) {
-		printf("socket creation failed...\n");
-		exit(0);
-	}
-	else
-		printf("Socket successfully created..\n");
-	bzero(&servaddr, sizeof(servaddr));
-
-	// assign IP, PORT
-	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	servaddr.sin_port = htons(PORT);
-
-	// Binding newly created socket to given IP and verification
-	if ((bind(sockfd, (SA*)&servaddr, sizeof(servaddr))) != 0) {
-		printf("socket bind failed...\n");
-		exit(0);
-	}
-	else
-		printf("Socket successfully binded..\n");
-
-	// Now server is ready to listen and verification
-	if ((listen(sockfd, 5)) != 0) {
-		printf("Listen failed...\n");
-		exit(0);
-	}
-	else
-		printf("Server listening..\n");
-	len = sizeof(cli);
-
-	// Accept the data packet from client and verification
-	connfd = accept(sockfd, (SA*)&cli, &len);
-	if (connfd < 0) {
-		printf("server accept failed...\n");
-		exit(0);
-	}
-	else
-		printf("server accept the client...\n");
-
-	// Function for chatting between client and server
-	func(connfd);
-
-	// After chatting close the socket
-	close(sockfd);
+/* Disconnect and kill the server and reinitialize global state */
+void destroy_server() {
+  close(serv_sd);
+  serv_sd = -1;
+  for (int i = 0; i < MAX_CLIENTS; i++) {
+    clients[i] = -1;
+  }
 }
-
