@@ -10,33 +10,33 @@
 #define CHUNKS 4 // the standard number of chunks made for a file in this system
 #define CHUNK_SIZE FILE_SIZE / CHUNKS // the standard size of a chunk for a file in this system (256 bytes)
 
-/* struct to define a file */
-typedef struct file {
-  struct file* next;
-  size_t size;
-} file_t;
-
-
-/* struct to define a file list a peer wants to share */
+/* struct to represent chunks for files */
 typedef struct {
-  file_t* head_file;
-  size_t len;
-} list_t;
+  int key;
+  char val[CHUNK_SIZE];
+} chunk_t;
 
-/* create a list of files */
-list_t* create_list(size_t len);
-
-/* destroy a list of files */
-void destroy_list(list_t* list);
-
-/* find next file in a list */
-file_t* get_next(list_t* list);
-
-/* find previous file in a list */
-file_t* get_prev(list_t* list);
+/* struct to simulate files */ 
+typedef struct {
+  char name[50];
+  char data[MAX_FILE_SIZE];
+  int lenth;
+  chunk_t chunks[CHUNKS];
+} sim_file;
 
 
-/* method to divide file into chunks */
-void create_chunks(file_t* file);
+/* This function hashes a key, which in this case is an
+iterate of the bytes in a file, into an index between 
+0 and 3 such that continguous blocks of 256 bytes are
+hashed to the same index */
+int hash(int key);
 
+/* This function inserts keys and values into a chunk,
+much like a standard insert into hash table function
+would operate */  
+void insert(chunk_t* chunk, int key, char val);
+
+/* This function creates chunks from a given simulated file,
+   effectively populating the chunk field of the sim file struct */
+void create_chunks(sim_file* file);
 #endif

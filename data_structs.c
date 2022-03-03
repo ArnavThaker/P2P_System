@@ -1,16 +1,21 @@
 #include "data_structs.h"
 
-#define MAX_FILE_SIZE 1024
-#define CHUNKS 4
+/* hash function specifically for hashing to four chunks */ 
+int hash(int key) {
+  return (int) floor(key / CHUNK_SIZE);
+}
 
-typedef struct {
-  char[50] name;
-  char[MAX_FILE_SIZE] data;
-  int lenth; 
-} sim_file;
+/* Hash table insert function specific to chunks */
+void insert(chunk_t* chunk, int key, char val) {
+  int i = hash(key);
+  chunk.key = i;
+  *(chunk + key).val = val;
+}
 
-void divide_file (sim_file file) {
+
+/* Method to create chunks */
+void create_chunks(sim_file* file) {
   for (int i = 0; i < MAX_FILE_SIZE; i++) {
-    
+    insert(file.chunk[hash(i)], i, file.data[i]);
   }
 }

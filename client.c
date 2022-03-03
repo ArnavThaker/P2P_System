@@ -14,6 +14,8 @@
 #include <arpa/inet.h>
 
 #include "client.h"
+#include "data_structs.c"
+
 #define PORT 5000
 #define IP "127.0.0.1"
 #define FILE_SIZE 1024
@@ -21,7 +23,8 @@
 #define MAX_FILES 5
 
 int cli_sd = -1;
-int files[
+int files[MAX_FILES];
+
 /*
 Need method for socket connection
  */
@@ -53,10 +56,6 @@ void disconnected(void) {
   close(cli_sd);
   cli_sd = -1;
 }
-
-/*
-Need method for chunk creation
- */
 
 /*
 Need method for chunk sending
